@@ -1,0 +1,29 @@
+{
+    "name": "dontdrinkandroot/path",
+    "description": "File and Directory path handling",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Philip Washington Sorst",
+            "email": "philip@sorst.net",
+            "homepage": "https://sorst.net"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Dontdrinkandroot\\Path\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Dontdrinkandroot\\Path\\": "test/"
+        }
+    },
+    "require": {
+        "php": ">=7.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.2"
+    }
+}
