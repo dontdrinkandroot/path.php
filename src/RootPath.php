@@ -19,4 +19,12 @@ class RootPath extends AbstractPath
     {
         return '';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType(): PathType
+    {
+        return PathType::ROOT;
+    }
 }

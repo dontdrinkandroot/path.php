@@ -105,4 +105,12 @@ class FilePath extends AbstractChildPath
     {
         return new FilePath($this->name, $parent);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType(): PathType
+    {
+        return PathType::FILE;
+    }
 }

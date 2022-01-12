@@ -181,4 +181,12 @@ class DirectoryPath extends AbstractChildPath
     {
         return new DirectoryPath($this->name, $parent);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType(): PathType
+    {
+        return PathType::DIRECTORY;
+    }
 }

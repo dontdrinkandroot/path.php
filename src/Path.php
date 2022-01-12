@@ -18,4 +18,7 @@ interface Path
     public function toAbsoluteString(string $separator = '/'): string;
 
     public function toRelativeString(string $separator = '/'): string;
+
+    public function getType(): PathType;
+
 }
