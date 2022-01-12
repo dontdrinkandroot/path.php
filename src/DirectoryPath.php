@@ -2,30 +2,24 @@
 
 namespace Dontdrinkandroot\Path;
 
-/**
- * @author Philip Washington Sorst <philip@sorst.net>
- */
-class DirectoryPath extends AbstractPath
+use Exception;
+
+class DirectoryPath extends AbstractChildPath
 {
     /**
-     * @var string
+     * @throws Exception Thrown if name contains invalid characters.
      */
-    protected $name;
-
-    /**
-     * @param string $name
-     *
-     * @throws \Exception Thrown if name contains invalid characters.
-     */
-    public function __construct(string $name = null)
-    {
-        if (strpos($name, '/') !== false) {
-            throw new \Exception('Name must not contain /');
+    public function __construct(
+        string $name,
+        RootPath|DirectoryPath $parent = new RootPath()
+    ) {
+        parent::__construct($name, $parent);
+        if ('' === $this->name) {
+            throw new Exception('Name must not be empty');
         }
 
-        if (!empty($name)) {
-            $this->name = $name;
-            $this->parentPath = new DirectoryPath();
+        if (str_contains($name, '/')) {
+            throw new Exception('Name must not contain /');
         }
     }
 
@@ -33,44 +27,38 @@ class DirectoryPath extends AbstractPath
      * @param string $name
      *
      * @return DirectoryPath
-     * @throws \Exception Thrown if appending directory name fails.
+     * @throws Exception Thrown if appending directory name fails.
      */
     public function appendDirectory(string $name): DirectoryPath
     {
         if (empty($name)) {
-            throw new \Exception('Name must not be empty');
+            throw new Exception('Name must not be empty');
         }
 
-        if (strpos($name, '/') !== false) {
-            throw new \Exception('Name must not contain /');
+        if (str_contains($name, '/')) {
+            throw new Exception('Name must not contain /');
         }
 
-        $directoryPath = new DirectoryPath($name);
-        $directoryPath->setParentPath($this);
-
-        return $directoryPath;
+        return new DirectoryPath($name, $this);
     }
 
     /**
      * @param string $name
      *
      * @return FilePath
-     * @throws \Exception Thrown if appending file name fails.
+     * @throws Exception Thrown if appending file name fails.
      */
     public function appendFile(string $name): FilePath
     {
         if (empty($name)) {
-            throw new \Exception('Name must not be empty');
+            throw new Exception('Name must not be empty');
         }
 
-        if (strpos($name, '/') !== false) {
-            throw new \Exception('Name must not contain /');
+        if (str_contains($name, '/')) {
+            throw new Exception('Name must not contain /');
         }
 
-        $filePath = new FilePath($name);
-        $filePath->setParentPath($this);
-
-        return $filePath;
+        return new FilePath($name, $this);
     }
 
     /**
@@ -78,11 +66,7 @@ class DirectoryPath extends AbstractPath
      */
     public function toRelativeString(string $separator = '/'): string
     {
-        if (null === $this->parentPath) {
-            return '';
-        }
-
-        return $this->parentPath->toRelativeString() . $this->name . $separator;
+        return $this->parent->toRelativeString() . $this->name . $separator;
     }
 
     /**
@@ -90,11 +74,7 @@ class DirectoryPath extends AbstractPath
      */
     public function toAbsoluteString(string $separator = '/'): string
     {
-        if (null === $this->parentPath) {
-            return $separator;
-        }
-
-        return $this->parentPath->toAbsoluteString() . $this->name . $separator;
+        return $this->parent->toAbsoluteString() . $this->name . $separator;
     }
 
     /**
@@ -106,58 +86,34 @@ class DirectoryPath extends AbstractPath
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRoot(): bool
-    {
-        return null === $this->parentPath && null === $this->name;
-    }
-
-    /**
      * @param string $pathString
      * @param string $separator
      *
-     * @return DirectoryPath
-     * @throws \Exception
+     * @return DirectoryPath|RootPath
+     * @throws Exception
      */
-    public static function parse($pathString, $separator = '/')
+    public static function parse(string $pathString, string $separator = '/'): DirectoryPath|RootPath
     {
-        if (empty($pathString)) {
-            return new DirectoryPath();
+        if ('' === $pathString) {
+            throw new Exception('Path String must not be empty');
         }
 
         if (!(PathUtils::getLastChar($pathString) === $separator)) {
-            throw new \Exception('Path String must end with ' . $separator);
+            throw new Exception('Path String must end with ' . $separator);
         }
 
-        return self::parseDirectoryPath($pathString, new DirectoryPath(), $separator);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isDirectoryPath(): bool
-    {
-        return true;
+        return self::parseDirectoryPath($pathString, new RootPath(), $separator);
     }
 
     /**
      * @param string $pathString
      *
-     * @return DirectoryPath|FilePath
-     * @throws \Exception
+     * @return Path
+     * @throws Exception
      */
     public function appendPathString(string $pathString): Path
     {
-        if (empty($pathString)) {
+        if ('' === $pathString) {
             return clone $this;
         }
 
@@ -180,50 +136,49 @@ class DirectoryPath extends AbstractPath
         $directoryPath = self::parseDirectoryPath($directoryPart, $lastPath);
 
         if (null !== $filePart) {
-            $filePath = new FilePath($filePart);
-            $filePath->setParentPath($directoryPath);
-
-            return $filePath;
+            return new FilePath($filePart, $directoryPath);
         }
 
         return $directoryPath;
     }
 
     /**
-     * @param string|null   $pathString
-     * @param DirectoryPath $rootPath
-     * @param string        $separator
+     * @param string|null            $pathString
+     * @param DirectoryPath|RootPath $rootPath
+     * @param string                 $separator
      *
-     * @return DirectoryPath
-     * @throws \Exception
+     * @return DirectoryPath|RootPath
+     * @throws Exception
      */
     protected static function parseDirectoryPath(
         ?string $pathString,
-        DirectoryPath $rootPath,
+        DirectoryPath|RootPath $rootPath,
         string $separator = '/'
-    ): DirectoryPath {
+    ): DirectoryPath|RootPath {
+        if (null === $pathString) {
+            return $rootPath;
+        }
+
         $lastPath = $rootPath;
-        if (null !== $pathString) {
-            $parts = explode($separator, $pathString);
-            foreach ($parts as $part) {
-                $trimmedPart = trim($part);
-                if ($trimmedPart === '..') {
-                    if (!$lastPath->hasParentPath()) {
-                        throw new \Exception('Exceeding root level');
-                    }
-                    $lastPath = $lastPath->getParentPath();
-                } else {
-                    if ($trimmedPart !== "" && $trimmedPart !== '.') {
-                        $directoryPath = new DirectoryPath($trimmedPart);
-                        if (null !== $lastPath) {
-                            $directoryPath->setParentPath($lastPath);
-                        }
-                        $lastPath = $directoryPath;
-                    }
+        $parts = explode($separator, $pathString);
+        foreach ($parts as $part) {
+            $trimmedPart = trim($part);
+            if ($trimmedPart === '..') {
+                if ($lastPath instanceof RootPath) {
+                    throw new Exception('Exceeding root level');
                 }
+                $lastPath = $lastPath->parent;
+            } elseif ($trimmedPart !== "" && $trimmedPart !== '.') {
+                $directoryPath = new DirectoryPath($trimmedPart, $lastPath);
+                $lastPath = $directoryPath;
             }
         }
 
         return $lastPath;
+    }
+
+    public function withParent(RootPath|DirectoryPath $parent): DirectoryPath
+    {
+        return new DirectoryPath($this->name, $parent);
     }
 }

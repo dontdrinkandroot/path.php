@@ -1,59 +1,46 @@
 <?php
 
-
 namespace Dontdrinkandroot\Path;
 
-/**
- * @author Philip Washington Sorst <philip@sorst.net>
- */
-class FilePath extends AbstractPath
+use Exception;
+
+class FilePath extends AbstractChildPath
 {
     /**
-     * @var string
+     * @throws Exception
      */
-    protected $fileName;
-
-    /**
-     * @var string|null
-     */
-    protected $extension;
-
-    /**
-     * @param string $name
-     *
-     * @throws \Exception
-     */
-    public function __construct(string $name)
-    {
+    public function __construct(
+        string $name,
+        RootPath|DirectoryPath $parent = new RootPath()
+    ) {
+        parent::__construct($name, $parent);
         if (empty($name)) {
-            throw new \Exception('Name must not be empty');
+            throw new Exception('Name must not be empty');
         }
 
-        if (strpos($name, '/') !== false) {
-            throw new \Exception('Name must not contain /');
+        if (str_contains($name, '/')) {
+            throw new Exception('Name must not contain /');
         }
-
-        $this->fileName = $name;
-        $lastDotPos = strrpos($name, '.');
-        if (false !== $lastDotPos && $lastDotPos > 0) {
-            $this->fileName = substr($name, 0, $lastDotPos);
-            $this->extension = substr($name, $lastDotPos + 1);
-        }
-
-        $this->parentPath = new DirectoryPath();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName(): string
+    public function getFileName(): string
     {
-        $name = $this->fileName;
-        if (null !== $this->extension) {
-            $name .= '.' . $this->extension;
+        $lastDotPos = strrpos($this->name, '.');
+        if (false !== $lastDotPos && $lastDotPos > 0) {
+            return substr($this->name, 0, $lastDotPos);
         }
 
-        return $name;
+        return $this->name;
+    }
+
+    public function getExtension(): ?string
+    {
+        $lastDotPos = strrpos($this->name, '.');
+        if (false !== $lastDotPos && $lastDotPos > 0) {
+            return substr($this->name, $lastDotPos + 1);
+        }
+
+        return null;
     }
 
     /**
@@ -61,7 +48,7 @@ class FilePath extends AbstractPath
      */
     public function toRelativeString(string $separator = '/'): string
     {
-        return $this->parentPath->toRelativeString($separator) . $this->getName();
+        return $this->parent->toRelativeString($separator) . $this->name;
     }
 
     /**
@@ -69,7 +56,7 @@ class FilePath extends AbstractPath
      */
     public function toAbsoluteString(string $separator = '/'): string
     {
-        return $this->parentPath->toAbsoluteString($separator) . $this->getName();
+        return $this->parent->toAbsoluteString($separator) . $this->name;
     }
 
     /**
@@ -77,31 +64,7 @@ class FilePath extends AbstractPath
      */
     public function prepend(DirectoryPath $path): Path
     {
-        return FilePath::parse($path->toAbsoluteString() . $this->toAbsoluteString());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isDirectoryPath(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @return string
-     */
-    public function getExtension(): ?string
-    {
-        return $this->extension;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFileName(): string
-    {
-        return $this->fileName;
+        return self::parse($path->toAbsoluteString() . $this->toAbsoluteString());
     }
 
     /**
@@ -109,16 +72,16 @@ class FilePath extends AbstractPath
      * @param string $separator
      *
      * @return FilePath
-     * @throws \Exception
+     * @throws Exception
      */
     public static function parse(string $pathString, string $separator = '/'): FilePath
     {
-        if (empty($pathString)) {
-            throw new \Exception('Path String must not be empty');
+        if ('' === $pathString) {
+            throw new Exception('Path String must not be empty');
         }
 
         if (PathUtils::getLastChar($pathString) === $separator) {
-            throw new \Exception('Path String must not end with ' . $separator);
+            throw new Exception('Path String must not end with ' . $separator);
         }
 
         $directoryPart = null;
@@ -132,9 +95,14 @@ class FilePath extends AbstractPath
         $filePath = new FilePath($filePart);
 
         if (null !== $directoryPart) {
-            $filePath->setParentPath(DirectoryPath::parse($directoryPart, $separator));
+            return $filePath->withParent(DirectoryPath::parse($directoryPart, $separator));
         }
 
         return $filePath;
+    }
+
+    public function withParent(RootPath|DirectoryPath $parent): FilePath
+    {
+        return new FilePath($this->name, $parent);
     }
 }

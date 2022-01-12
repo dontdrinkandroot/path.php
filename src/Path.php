@@ -2,22 +2,9 @@
 
 namespace Dontdrinkandroot\Path;
 
-/**
- * @author Philip Washington Sorst <philip@sorst.net>
- */
 interface Path
 {
-    public function getName(): ?string;
-
-    public function hasParentPath(): bool;
-
-    public function getParentPath(): DirectoryPath;
-
-    public function prepend(DirectoryPath $path): Path;
-
-    /**
-     * @return Path[]
-     */
+    /** @return list<Path> */
     public function collectPaths(): array;
 
     public function toAbsoluteUrlString(): string;
@@ -31,8 +18,4 @@ interface Path
     public function toAbsoluteString(string $separator = '/'): string;
 
     public function toRelativeString(string $separator = '/'): string;
-
-    public function isFilePath(): bool;
-
-    public function isDirectoryPath(): bool;
 }

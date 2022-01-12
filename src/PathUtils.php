@@ -2,40 +2,29 @@
 
 namespace Dontdrinkandroot\Path;
 
-/**
- * @author Philip Washington Sorst <philip@sorst.net>
- */
 class PathUtils
 {
-    public static function getPathDiff(Path $fromPath, Path $toPath, string $separator = '/'): string
-    {
-        /** @var DirectoryPath $fromDirectoryPath */
-        $fromDirectoryPath = $fromPath;
-        if ($fromPath->isFilePath()) {
-            $fromDirectoryPath = $fromPath->getParentPath();
-        }
-
-        /** @var DirectoryPath $toDirectoryPath */
-        $toDirectoryPath = $toPath;
-        if ($toPath->isFilePath()) {
-            $toDirectoryPath = $toPath->getParentPath();
-        }
+    public static function getPathDiff(
+        RootPath|DirectoryPath|FilePath $fromPath,
+        RootPath|DirectoryPath|FilePath $toPath,
+        string $separator = '/'
+    ): string {
+        $fromDirectoryPath = ($fromPath instanceof FilePath) ? $fromPath->parent : $fromPath;
+        $toDirectoryPath = ($toPath instanceof FilePath) ? $toPath->parent : $toPath;
 
         $pathDiff = static::getDirectoryPathDiff($fromDirectoryPath, $toDirectoryPath, $separator);
-        if ($toPath->isFilePath()) {
-            $pathDiff .= $toPath->getName();
+        if ($toPath instanceof FilePath) {
+            $pathDiff .= $toPath->name;
         }
 
         return $pathDiff;
     }
 
     public static function getDirectoryPathDiff(
-        DirectoryPath $fromPath,
-        DirectoryPath $toPath,
+        RootPath|DirectoryPath $fromPath,
+        RootPath|DirectoryPath $toPath,
         string $separator = '/'
     ): string {
-        $result = '';
-
         $fromParts = static::getDirectoryPathParts($fromPath);
         $toParts = static::getDirectoryPathParts($toPath);
 
@@ -51,9 +40,7 @@ class PathUtils
         }
 
         $moveUp = $fromDepth - $equalUpToIndex;
-        for ($i = 0; $i < $moveUp; $i++) {
-            $result .= '..' . $separator;
-        }
+        $result = str_repeat('..' . $separator, $moveUp);
 
         for ($i = $equalUpToIndex; $i < $toDepth; $i++) {
             $result .= $toParts[$i] . $separator;
@@ -63,17 +50,17 @@ class PathUtils
     }
 
     /**
-     * @param DirectoryPath $path
+     * @param RootPath|DirectoryPath $path
      *
      * @return string[]
      */
-    public static function getDirectoryPathParts(DirectoryPath $path): array
+    public static function getDirectoryPathParts(RootPath|DirectoryPath $path): array
     {
         $currentPath = $path;
         $parts = [];
-        while ($currentPath->hasParentPath()) {
-            $parts[] = $currentPath->getName();
-            $currentPath = $currentPath->getParentPath();
+        while ($currentPath instanceof DirectoryPath) {
+            $parts[] = $currentPath->name;
+            $currentPath = $currentPath->parent;
         }
 
         return array_reverse($parts);
@@ -83,27 +70,27 @@ class PathUtils
      * Checks if a string ends with another string.
      *
      * @param string $haystack The string to search in.
-     * @param string $needle The string to search.
+     * @param string $needle   The string to search.
+     *
      * @return bool
      */
     public static function endsWith(string $haystack, string $needle): bool
     {
-        return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
+        return $needle === "" || str_ends_with($haystack, $needle);
     }
 
     /**
      * Get the last character of a string.
      *
      * @param string false The string to get the last character of.
-     * @return string|null The last character or false if not found.
+     *
+     * @return string|null The last character or null if not found.
      */
-    public static function getLastChar($str)
+    public static function getLastChar(string $str): ?string
     {
-        $length = strlen($str);
-        if ($length === 0) {
-            return false;
+        if ($str === '') {
+            return null;
         }
-
-        return substr($str, $length - 1, 1);
+        return substr($str, -1);
     }
 }

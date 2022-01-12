@@ -1,52 +1,25 @@
 <?php
 
-
 namespace Dontdrinkandroot\Path;
 
-/**
- * @author Philip Washington Sorst <philip@sorst.net>
- */
+use RuntimeException;
+
 abstract class AbstractPath implements Path
 {
-    /**
-     * @var DirectoryPath
-     */
-    protected $parentPath;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasParentPath(): bool
-    {
-        return (null !== $this->parentPath);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParentPath(): DirectoryPath
-    {
-        return $this->parentPath;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function collectPaths(): array
     {
-        if (!$this->hasParentPath()) {
+        if ($this instanceof RootPath) {
             return [$this];
         }
 
-        return array_merge($this->getParentPath()->collectPaths(), [$this]);
-    }
+        if (($this instanceof AbstractChildPath)) {
+            return [...$this->parent->collectPaths(), $this];
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isFilePath(): bool
-    {
-        return !$this->isDirectoryPath();
+        throw new RuntimeException('Invalid path implementation');
     }
 
     /**
@@ -81,17 +54,6 @@ abstract class AbstractPath implements Path
         return $this->toRelativeString(DIRECTORY_SEPARATOR);
     }
 
-    /**
-     * @param DirectoryPath $path
-     */
-    public function setParentPath(DirectoryPath $path)
-    {
-        $this->parentPath = $path;
-    }
-
-    /**
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->toAbsoluteString();

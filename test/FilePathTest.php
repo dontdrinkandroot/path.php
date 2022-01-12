@@ -3,81 +3,84 @@
 
 namespace Dontdrinkandroot\Path;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
+use Throwable;
+use TypeError;
 
 class FilePathTest extends TestCase
 {
-    public function testBasic()
+    public function testBasic(): void
     {
         $path = FilePath::parse('/index.md');
-        $this->assertEquals('index.md', $path->getName());
+        $this->assertEquals('index.md', $path->name);
         $this->assertEquals('md', $path->getExtension());
         $this->assertEquals('index', $path->getFileName());
 
         $path = FilePath::parse('index.md');
-        $this->assertEquals('index.md', $path->getName());
+        $this->assertEquals('index.md', $path->name);
         $this->assertEquals('md', $path->getExtension());
         $this->assertEquals('index', $path->getFileName());
 
         $path = FilePath::parse('/sub/subsub/index.md');
-        $this->assertEquals('index.md', $path->getName());
+        $this->assertEquals('index.md', $path->name);
         $this->assertEquals('md', $path->getExtension());
         $this->assertEquals('index', $path->getFileName());
 
-        $this->assertEquals('/sub/subsub/', $path->getParentPath()->toAbsoluteUrlString());
+        $this->assertEquals('/sub/subsub/', $path->parent->toAbsoluteUrlString());
 
         $path = FilePath::parse('sub/subsub/index.md');
-        $this->assertEquals('index.md', $path->getName());
+        $this->assertEquals('index.md', $path->name);
         $this->assertEquals('md', $path->getExtension());
         $this->assertEquals('index', $path->getFileName());
 
-        $this->assertEquals('/sub/subsub/', $path->getParentPath()->toAbsoluteUrlString());
+        $this->assertEquals('/sub/subsub/', $path->parent->toAbsoluteUrlString());
     }
 
-    public function testNoExtension()
+    public function testNoExtension(): void
     {
         $path = FilePath::parse('/index');
-        $this->assertEquals('index', $path->getName());
+        $this->assertEquals('index', $path->name);
         $this->assertNull($path->getExtension());
         $this->assertEquals('index', $path->getFileName());
 
         $path = FilePath::parse('/sub/index');
-        $this->assertEquals('index', $path->getName());
+        $this->assertEquals('index', $path->name);
         $this->assertNull($path->getExtension());
         $this->assertEquals('index', $path->getFileName());
 
-        $this->assertEquals('/sub/', $path->getParentPath()->toAbsoluteUrlString());
+        $this->assertEquals('/sub/', $path->parent->toAbsoluteUrlString());
     }
 
-    public function testDotFile()
+    public function testDotFile(): void
     {
         $path = FilePath::parse('/.index');
-        $this->assertEquals('.index', $path->getName());
+        $this->assertEquals('.index', $path->name);
         $this->assertNull($path->getExtension());
         $this->assertEquals('.index', $path->getFileName());
 
         $path = FilePath::parse('/sub/.index');
-        $this->assertEquals('.index', $path->getName());
+        $this->assertEquals('.index', $path->name);
         $this->assertNull($path->getExtension());
         $this->assertEquals('.index', $path->getFileName());
 
-        $this->assertEquals('/sub/', $path->getParentPath()->toAbsoluteUrlString());
+        $this->assertEquals('/sub/', $path->parent->toAbsoluteUrlString());
     }
 
-    public function testInvalidPath()
+    public function testInvalidPath(): void
     {
         try {
             $path = new FilePath(null);
             $this->fail('Exception expected');
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             /* Expected */
-            $this->assertInstanceOf(\TypeError::class, $e);
+            $this->assertInstanceOf(TypeError::class, $e);
         }
 
         try {
             $path = new FilePath('bla/bla');
             $this->fail('Exception expected');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             /* Expected */
             $this->assertEquals('Name must not contain /', $e->getMessage());
         }
@@ -85,7 +88,7 @@ class FilePathTest extends TestCase
         try {
             $path = FilePath::parse('');
             $this->fail('Exception expected');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             /* Expected */
             $this->assertEquals('Path String must not be empty', $e->getMessage());
         }
@@ -93,24 +96,27 @@ class FilePathTest extends TestCase
         try {
             $path = FilePath::parse('/');
             $this->fail('Exception expected');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             /* Expected */
             $this->assertEquals('Path String must not end with /', $e->getMessage());
         }
     }
 
-    public function testCollectPaths()
+    public function testCollectPaths(): void
     {
         $path = FilePath::parse("/sub/subsub/index.md");
         $paths = $path->collectPaths();
         $this->assertCount(4, $paths);
-        $this->assertEquals(null, $paths[0]->getName());
-        $this->assertEquals('sub', $paths[1]->getName());
-        $this->assertEquals('subsub', $paths[2]->getName());
-        $this->assertEquals('index', $paths[3]->getFilename());
+        $this->assertInstanceOf(RootPath::class, $paths[0]);
+        $this->assertInstanceOf(DirectoryPath::class, $paths[1]);
+        $this->assertEquals('sub', $paths[1]->name);
+        $this->assertInstanceOf(DirectoryPath::class, $paths[2]);
+        $this->assertEquals('subsub', $paths[2]->name);
+        $this->assertInstanceOf(FilePath::class, $paths[3]);
+        $this->assertEquals('index.md', $paths[3]->name);
     }
 
-    public function testToStrings()
+    public function testToStrings(): void
     {
         $path = FilePath::parse("/sub/subsub/index.md");
         $this->assertEquals('/sub/subsub/index.md', $path->toAbsoluteString());
