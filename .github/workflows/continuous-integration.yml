@@ -1,0 +1,39 @@
+name: "Continuous Integration"
+
+on: push
+
+jobs:
+    phpunit:
+        name: PHPUnit
+        runs-on: ubuntu-latest
+        steps:
+            -   name: "Checkout code"
+                uses: "actions/checkout@v2"
+            -   name: "Install PHP"
+                uses: "shivammathur/setup-php@v2"
+                with:
+                    php-version: "8.1"
+            -   name: "Install dependencies with Composer"
+                uses: "ramsey/composer-install@v1"
+            -   name: "Run PHPUnit"
+                run: "vendor/bin/phpunit"
+
+    psalm:
+        name: Psalm
+        runs-on: ubuntu-latest
+        steps:
+            -   name: "Checkout code"
+                uses: "actions/checkout@v2"
+            -   name: "Install PHP"
+                uses: "shivammathur/setup-php@v2"
+                with:
+                    php-version: "8.1"
+            -   name: "Install dependencies with Composer"
+                uses: "ramsey/composer-install@v1"
+            -   name: "Install psalm"
+                run: |
+                    wget https://github.com/vimeo/psalm/releases/latest/download/psalm.phar -O /usr/local/bin/psalm \
+                    && chmod +x /usr/local/bin/psalm
+            -   name: "Run psalm"
+                run: "psalm"
+
