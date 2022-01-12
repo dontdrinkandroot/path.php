@@ -2,12 +2,12 @@
 
 namespace Dontdrinkandroot\Path;
 
-use Exception;
+use InvalidArgumentException;
 
 class FilePath extends AbstractChildPath
 {
     /**
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function __construct(
         string $name,
@@ -15,11 +15,11 @@ class FilePath extends AbstractChildPath
     ) {
         parent::__construct($name, $parent);
         if (empty($name)) {
-            throw new Exception('Name must not be empty');
+            throw new InvalidArgumentException('Name must not be empty');
         }
 
         if (str_contains($name, '/')) {
-            throw new Exception('Name must not contain /');
+            throw new InvalidArgumentException('Name must not contain /');
         }
     }
 
@@ -72,16 +72,16 @@ class FilePath extends AbstractChildPath
      * @param string $separator
      *
      * @return FilePath
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public static function parse(string $pathString, string $separator = '/'): FilePath
     {
         if ('' === $pathString) {
-            throw new Exception('Path String must not be empty');
+            throw new InvalidArgumentException('Path String must not be empty');
         }
 
         if (PathUtils::getLastChar($pathString) === $separator) {
-            throw new Exception('Path String must not end with ' . $separator);
+            throw new InvalidArgumentException('Path String must not end with ' . $separator);
         }
 
         $directoryPart = null;

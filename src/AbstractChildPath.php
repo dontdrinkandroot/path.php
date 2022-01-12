@@ -9,12 +9,4 @@ abstract class AbstractChildPath extends AbstractPath
         public readonly RootPath|DirectoryPath $parent = new RootPath()
     ) {
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isRootPath(): bool
-    {
-        return false;
-    }
 }

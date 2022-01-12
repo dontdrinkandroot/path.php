@@ -3,11 +3,12 @@
 namespace Dontdrinkandroot\Path;
 
 use Exception;
+use InvalidArgumentException;
 
 class DirectoryPath extends AbstractChildPath
 {
     /**
-     * @throws Exception Thrown if name contains invalid characters.
+     * @throws InvalidArgumentException Thrown if name contains invalid characters.
      */
     public function __construct(
         string $name,
@@ -15,11 +16,11 @@ class DirectoryPath extends AbstractChildPath
     ) {
         parent::__construct($name, $parent);
         if ('' === $this->name) {
-            throw new Exception('Name must not be empty');
+            throw new InvalidArgumentException('Name must not be empty');
         }
 
         if (str_contains($name, '/')) {
-            throw new Exception('Name must not contain /');
+            throw new InvalidArgumentException('Name must not contain /');
         }
     }
 
@@ -27,16 +28,16 @@ class DirectoryPath extends AbstractChildPath
      * @param string $name
      *
      * @return DirectoryPath
-     * @throws Exception Thrown if appending directory name fails.
+     * @throws InvalidArgumentException Thrown if appending directory name fails.
      */
     public function appendDirectory(string $name): DirectoryPath
     {
         if (empty($name)) {
-            throw new Exception('Name must not be empty');
+            throw new InvalidArgumentException('Name must not be empty');
         }
 
         if (str_contains($name, '/')) {
-            throw new Exception('Name must not contain /');
+            throw new InvalidArgumentException('Name must not contain /');
         }
 
         return new DirectoryPath($name, $this);
@@ -46,16 +47,16 @@ class DirectoryPath extends AbstractChildPath
      * @param string $name
      *
      * @return FilePath
-     * @throws Exception Thrown if appending file name fails.
+     * @throws InvalidArgumentException Thrown if appending file name fails.
      */
     public function appendFile(string $name): FilePath
     {
         if (empty($name)) {
-            throw new Exception('Name must not be empty');
+            throw new InvalidArgumentException('Name must not be empty');
         }
 
         if (str_contains($name, '/')) {
-            throw new Exception('Name must not contain /');
+            throw new InvalidArgumentException('Name must not contain /');
         }
 
         return new FilePath($name, $this);
@@ -90,16 +91,16 @@ class DirectoryPath extends AbstractChildPath
      * @param string $separator
      *
      * @return DirectoryPath|RootPath
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public static function parse(string $pathString, string $separator = '/'): DirectoryPath|RootPath
     {
         if ('' === $pathString) {
-            throw new Exception('Path String must not be empty');
+            throw new InvalidArgumentException('Path String must not be empty');
         }
 
         if (!(PathUtils::getLastChar($pathString) === $separator)) {
-            throw new Exception('Path String must end with ' . $separator);
+            throw new InvalidArgumentException('Path String must end with ' . $separator);
         }
 
         return self::parseDirectoryPath($pathString, new RootPath(), $separator);
