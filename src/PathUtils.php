@@ -65,15 +65,17 @@ class PathUtils
     /**
      * @param DirectoryPath $path
      *
-     * @return string[]
+     * @return list<string>
      */
     public static function getDirectoryPathParts(DirectoryPath $path): array
     {
         $currentPath = $path;
         $parts = [];
         while ($currentPath->hasParentPath()) {
-            $parts[] = $currentPath->getName();
-            $currentPath = $currentPath->getParentPath();
+            if (null !== ($name = $currentPath->getName())) {
+                $parts[] = $name;
+                $currentPath = $currentPath->getParentPath();
+            }
         }
 
         return array_reverse($parts);
@@ -83,7 +85,8 @@ class PathUtils
      * Checks if a string ends with another string.
      *
      * @param string $haystack The string to search in.
-     * @param string $needle The string to search.
+     * @param string $needle   The string to search.
+     *
      * @return bool
      */
     public static function endsWith(string $haystack, string $needle): bool
@@ -95,7 +98,8 @@ class PathUtils
      * Get the last character of a string.
      *
      * @param string false The string to get the last character of.
-     * @return string|null The last character or false if not found.
+     *
+     * @return string|false The last character or false if not found.
      */
     public static function getLastChar($str)
     {

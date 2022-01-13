@@ -2,6 +2,8 @@
 
 namespace Dontdrinkandroot\Path;
 
+use Exception;
+
 /**
  * @author Philip Washington Sorst <philip@sorst.net>
  */
@@ -15,12 +17,12 @@ class DirectoryPath extends AbstractPath
     /**
      * @param string $name
      *
-     * @throws \Exception Thrown if name contains invalid characters.
+     * @throws Exception Thrown if name contains invalid characters.
      */
     public function __construct(string $name = null)
     {
         if (strpos($name, '/') !== false) {
-            throw new \Exception('Name must not contain /');
+            throw new Exception('Name must not contain /');
         }
 
         if (!empty($name)) {
@@ -33,16 +35,16 @@ class DirectoryPath extends AbstractPath
      * @param string $name
      *
      * @return DirectoryPath
-     * @throws \Exception Thrown if appending directory name fails.
+     * @throws Exception Thrown if appending directory name fails.
      */
     public function appendDirectory(string $name): DirectoryPath
     {
         if (empty($name)) {
-            throw new \Exception('Name must not be empty');
+            throw new Exception('Name must not be empty');
         }
 
         if (strpos($name, '/') !== false) {
-            throw new \Exception('Name must not contain /');
+            throw new Exception('Name must not contain /');
         }
 
         $directoryPath = new DirectoryPath($name);
@@ -55,16 +57,16 @@ class DirectoryPath extends AbstractPath
      * @param string $name
      *
      * @return FilePath
-     * @throws \Exception Thrown if appending file name fails.
+     * @throws Exception Thrown if appending file name fails.
      */
     public function appendFile(string $name): FilePath
     {
         if (empty($name)) {
-            throw new \Exception('Name must not be empty');
+            throw new Exception('Name must not be empty');
         }
 
         if (strpos($name, '/') !== false) {
-            throw new \Exception('Name must not contain /');
+            throw new Exception('Name must not contain /');
         }
 
         $filePath = new FilePath($name);
@@ -126,7 +128,7 @@ class DirectoryPath extends AbstractPath
      * @param string $separator
      *
      * @return DirectoryPath
-     * @throws \Exception
+     * @throws Exception
      */
     public static function parse($pathString, $separator = '/')
     {
@@ -135,7 +137,7 @@ class DirectoryPath extends AbstractPath
         }
 
         if (!(PathUtils::getLastChar($pathString) === $separator)) {
-            throw new \Exception('Path String must end with ' . $separator);
+            throw new Exception('Path String must end with ' . $separator);
         }
 
         return self::parseDirectoryPath($pathString, new DirectoryPath(), $separator);
@@ -153,7 +155,7 @@ class DirectoryPath extends AbstractPath
      * @param string $pathString
      *
      * @return DirectoryPath|FilePath
-     * @throws \Exception
+     * @throws Exception
      */
     public function appendPathString(string $pathString): Path
     {
@@ -195,7 +197,7 @@ class DirectoryPath extends AbstractPath
      * @param string        $separator
      *
      * @return DirectoryPath
-     * @throws \Exception
+     * @throws Exception
      */
     protected static function parseDirectoryPath(
         ?string $pathString,
@@ -209,17 +211,13 @@ class DirectoryPath extends AbstractPath
                 $trimmedPart = trim($part);
                 if ($trimmedPart === '..') {
                     if (!$lastPath->hasParentPath()) {
-                        throw new \Exception('Exceeding root level');
+                        throw new Exception('Exceeding root level');
                     }
                     $lastPath = $lastPath->getParentPath();
-                } else {
-                    if ($trimmedPart !== "" && $trimmedPart !== '.') {
-                        $directoryPath = new DirectoryPath($trimmedPart);
-                        if (null !== $lastPath) {
-                            $directoryPath->setParentPath($lastPath);
-                        }
-                        $lastPath = $directoryPath;
-                    }
+                } elseif ($trimmedPart !== "" && $trimmedPart !== '.') {
+                    $directoryPath = new DirectoryPath($trimmedPart);
+                    $directoryPath->setParentPath($lastPath);
+                    $lastPath = $directoryPath;
                 }
             }
         }
