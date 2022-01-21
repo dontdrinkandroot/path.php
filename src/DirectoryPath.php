@@ -21,13 +21,15 @@ class DirectoryPath extends AbstractPath
      */
     public function __construct(string $name = null)
     {
-        if (strpos($name, '/') !== false) {
-            throw new Exception('Name must not contain /');
-        }
+        if (null !== $name) {
+            if (strpos($name, '/') !== false) {
+                throw new Exception('Name must not contain /');
+            }
 
-        if (!empty($name)) {
-            $this->name = $name;
-            $this->parentPath = new DirectoryPath();
+            if ('' !== $name) {
+                $this->name = $name;
+                $this->parentPath = new DirectoryPath();
+            }
         }
     }
 
