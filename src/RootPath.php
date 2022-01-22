@@ -2,7 +2,7 @@
 
 namespace Dontdrinkandroot\Path;
 
-class RootPath extends AbstractPath
+class RootPath extends AbstractPath implements ParentPath
 {
     /**
      * {@inheritdoc}

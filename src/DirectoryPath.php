@@ -5,7 +5,7 @@ namespace Dontdrinkandroot\Path;
 use Exception;
 use InvalidArgumentException;
 
-class DirectoryPath extends AbstractChildPath
+class DirectoryPath extends AbstractChildPath implements ParentPath
 {
     /**
      * @throws InvalidArgumentException Thrown if name contains invalid characters.
