@@ -5,6 +5,6 @@ namespace Dontdrinkandroot\Path;
 /**
  * Marker interface that denotes if the path can have children.
  */
-interface ParentPath
+interface ParentPath extends Path
 {
 }
