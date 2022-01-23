@@ -8,56 +8,21 @@ use InvalidArgumentException;
 class DirectoryPath extends AbstractChildPath implements ParentPath
 {
     /**
-     * @throws InvalidArgumentException Thrown if name contains invalid characters.
-     */
-    public function __construct(
-        string $name,
-        RootPath|DirectoryPath $parent = new RootPath()
-    ) {
-        parent::__construct($name, $parent);
-        if ('' === $this->name) {
-            throw new InvalidArgumentException('Name must not be empty');
-        }
-
-        if (str_contains($name, '/')) {
-            throw new InvalidArgumentException('Name must not contain /');
-        }
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return DirectoryPath
-     * @throws InvalidArgumentException Thrown if appending directory name fails.
+     * {@inheritdoc}
      */
     public function appendDirectory(string $name): DirectoryPath
     {
-        if (empty($name)) {
-            throw new InvalidArgumentException('Name must not be empty');
-        }
-
-        if (str_contains($name, '/')) {
-            throw new InvalidArgumentException('Name must not contain /');
-        }
+        PathUtils::assertValidName($name);
 
         return new DirectoryPath($name, $this);
     }
 
     /**
-     * @param string $name
-     *
-     * @return FilePath
-     * @throws InvalidArgumentException Thrown if appending file name fails.
+     * {@inheritdoc}
      */
     public function appendFile(string $name): FilePath
     {
-        if (empty($name)) {
-            throw new InvalidArgumentException('Name must not be empty');
-        }
-
-        if (str_contains($name, '/')) {
-            throw new InvalidArgumentException('Name must not contain /');
-        }
+        PathUtils::assertValidName($name);
 
         return new FilePath($name, $this);
     }
@@ -81,19 +46,22 @@ class DirectoryPath extends AbstractChildPath implements ParentPath
     /**
      * {@inheritdoc}
      */
-    public function prepend(DirectoryPath $path): Path
+    public function prepend(DirectoryPath $path): DirectoryPath
     {
-        return DirectoryPath::parse($path->toAbsoluteString() . $this->toAbsoluteString());
+        $directoryPath = DirectoryPath::parse($path->toAbsoluteString() . $this->toAbsoluteString());
+        assert($directoryPath instanceof DirectoryPath);
+
+        return $directoryPath;
     }
 
     /**
      * @param string $pathString
      * @param string $separator
      *
-     * @return DirectoryPath|RootPath
+     * @return ParentPath
      * @throws InvalidArgumentException
      */
-    public static function parse(string $pathString, string $separator = '/'): DirectoryPath|RootPath
+    public static function parse(string $pathString, string $separator = '/'): ParentPath
     {
         if ('' === $pathString) {
             throw new InvalidArgumentException('Path String must not be empty');
@@ -148,14 +116,14 @@ class DirectoryPath extends AbstractChildPath implements ParentPath
      * @param DirectoryPath|RootPath $rootPath
      * @param string                 $separator
      *
-     * @return DirectoryPath|RootPath
+     * @return ParentPath
      * @throws Exception
      */
     protected static function parseDirectoryPath(
         ?string $pathString,
-        DirectoryPath|RootPath $rootPath,
+        ParentPath $rootPath,
         string $separator = '/'
-    ): DirectoryPath|RootPath {
+    ): ParentPath {
         if (null === $pathString) {
             return $rootPath;
         }
@@ -165,10 +133,10 @@ class DirectoryPath extends AbstractChildPath implements ParentPath
         foreach ($parts as $part) {
             $trimmedPart = trim($part);
             if ($trimmedPart === '..') {
-                if ($lastPath instanceof RootPath) {
+                if (!($lastPath instanceof DirectoryPath)) {
                     throw new Exception('Exceeding root level');
                 }
-                $lastPath = $lastPath->parent;
+                $lastPath = $lastPath->getParent();
             } elseif ($trimmedPart !== "" && $trimmedPart !== '.') {
                 $directoryPath = new DirectoryPath($trimmedPart, $lastPath);
                 $lastPath = $directoryPath;

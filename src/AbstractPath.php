@@ -27,7 +27,7 @@ abstract class AbstractPath implements Path
      */
     public function toAbsoluteUrlString(): string
     {
-        return $this->toAbsoluteString('/');
+        return $this->toAbsoluteString();
     }
 
     /**
@@ -35,7 +35,7 @@ abstract class AbstractPath implements Path
      */
     public function toRelativeUrlString(): string
     {
-        return $this->toRelativeString('/');
+        return $this->toRelativeString();
     }
 
     /**
@@ -57,5 +57,18 @@ abstract class AbstractPath implements Path
     public function __toString(): string
     {
         return $this->toAbsoluteString();
+    }
+
+    public static function parse(string $pathString): Path
+    {
+        if ($pathString === '' || $pathString === '/') {
+            return new RootPath();
+        }
+
+        if (str_ends_with($pathString, '/')) {
+            return DirectoryPath::parse($pathString);
+        }
+
+        return FilePath::parse($pathString);
     }
 }

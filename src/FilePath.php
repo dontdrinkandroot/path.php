@@ -6,23 +6,6 @@ use InvalidArgumentException;
 
 class FilePath extends AbstractChildPath
 {
-    /**
-     * @throws InvalidArgumentException
-     */
-    public function __construct(
-        string $name,
-        RootPath|DirectoryPath $parent = new RootPath()
-    ) {
-        parent::__construct($name, $parent);
-        if (empty($name)) {
-            throw new InvalidArgumentException('Name must not be empty');
-        }
-
-        if (str_contains($name, '/')) {
-            throw new InvalidArgumentException('Name must not contain /');
-        }
-    }
-
     public function getFileName(): string
     {
         $lastDotPos = strrpos($this->name, '.');
@@ -62,7 +45,7 @@ class FilePath extends AbstractChildPath
     /**
      * {@inheritdoc}
      */
-    public function prepend(DirectoryPath $path): Path
+    public function prepend(DirectoryPath $path): FilePath
     {
         return self::parse($path->toAbsoluteString() . $this->toAbsoluteString());
     }
@@ -92,13 +75,10 @@ class FilePath extends AbstractChildPath
             $filePart = substr($pathString, $lastSlashPos + 1);
         }
 
-        $filePath = new FilePath($filePart);
-
-        if (null !== $directoryPart) {
-            return $filePath->withParent(DirectoryPath::parse($directoryPart, $separator));
-        }
-
-        return $filePath;
+        return new FilePath(
+            $filePart,
+            null !== $directoryPart ? DirectoryPath::parse($directoryPart, $separator) : new RootPath()
+        );
     }
 
     public function withParent(RootPath|DirectoryPath $parent): FilePath

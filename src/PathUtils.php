@@ -2,15 +2,18 @@
 
 namespace Dontdrinkandroot\Path;
 
+use InvalidArgumentException;
+use RuntimeException;
+
 class PathUtils
 {
     public static function getPathDiff(
-        RootPath|DirectoryPath|FilePath $fromPath,
-        RootPath|DirectoryPath|FilePath $toPath,
+        Path $fromPath,
+        Path $toPath,
         string $separator = '/'
     ): string {
-        $fromDirectoryPath = ($fromPath instanceof FilePath) ? $fromPath->parent : $fromPath;
-        $toDirectoryPath = ($toPath instanceof FilePath) ? $toPath->parent : $toPath;
+        $fromDirectoryPath = self::resolveNearestParentPath($fromPath);
+        $toDirectoryPath = self::resolveNearestParentPath($toPath);
 
         $pathDiff = static::getDirectoryPathDiff($fromDirectoryPath, $toDirectoryPath, $separator);
         if ($toPath instanceof FilePath) {
@@ -21,8 +24,8 @@ class PathUtils
     }
 
     public static function getDirectoryPathDiff(
-        RootPath|DirectoryPath $fromPath,
-        RootPath|DirectoryPath $toPath,
+        ParentPath $fromPath,
+        ParentPath $toPath,
         string $separator = '/'
     ): string {
         $fromParts = static::getDirectoryPathParts($fromPath);
@@ -50,11 +53,11 @@ class PathUtils
     }
 
     /**
-     * @param RootPath|DirectoryPath $path
+     * @param ParentPath $path
      *
      * @return string[]
      */
-    public static function getDirectoryPathParts(RootPath|DirectoryPath $path): array
+    public static function getDirectoryPathParts(ParentPath $path): array
     {
         $currentPath = $path;
         $parts = [];
@@ -92,5 +95,29 @@ class PathUtils
             return null;
         }
         return substr($str, -1);
+    }
+
+    public static function assertValidName(string $name): void
+    {
+        if ('' === $name) {
+            throw new InvalidArgumentException('Name must not be empty');
+        }
+
+        if (str_contains($name, '/')) {
+            throw new InvalidArgumentException('Name must not contain /');
+        }
+    }
+
+    public static function resolveNearestParentPath(Path $path): ParentPath
+    {
+        if ($path instanceof FilePath) {
+            return $path->parent;
+        }
+
+        if ($path instanceof ParentPath) {
+            return $path;
+        }
+
+        throw new RuntimeException('Could not resolve parent Path');
     }
 }
