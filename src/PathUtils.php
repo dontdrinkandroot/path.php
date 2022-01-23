@@ -24,8 +24,8 @@ class PathUtils
     }
 
     public static function getDirectoryPathDiff(
-        ParentPath $fromPath,
-        ParentPath $toPath,
+        DirectoryPath $fromPath,
+        DirectoryPath $toPath,
         string $separator = '/'
     ): string {
         $fromParts = static::getDirectoryPathParts($fromPath);
@@ -53,15 +53,15 @@ class PathUtils
     }
 
     /**
-     * @param ParentPath $path
+     * @param DirectoryPath $path
      *
      * @return string[]
      */
-    public static function getDirectoryPathParts(ParentPath $path): array
+    public static function getDirectoryPathParts(DirectoryPath $path): array
     {
         $currentPath = $path;
         $parts = [];
-        while ($currentPath instanceof DirectoryPath) {
+        while ($currentPath instanceof ChildDirectoryPath) {
             $parts[] = $currentPath->name;
             $currentPath = $currentPath->parent;
         }
@@ -108,13 +108,13 @@ class PathUtils
         }
     }
 
-    public static function resolveNearestParentPath(Path $path): ParentPath
+    public static function resolveNearestParentPath(Path $path): DirectoryPath
     {
         if ($path instanceof FilePath) {
             return $path->parent;
         }
 
-        if ($path instanceof ParentPath) {
+        if ($path instanceof DirectoryPath) {
             return $path;
         }
 

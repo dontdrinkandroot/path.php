@@ -107,10 +107,10 @@ class FilePathTest extends TestCase
         $path = FilePath::parse("/sub/subsub/index.md");
         $paths = $path->collectPaths();
         $this->assertCount(4, $paths);
-        $this->assertInstanceOf(RootPath::class, $paths[0]);
-        $this->assertInstanceOf(DirectoryPath::class, $paths[1]);
+        $this->assertInstanceOf(RootDirectoryPath::class, $paths[0]);
+        $this->assertInstanceOf(ChildDirectoryPath::class, $paths[1]);
         $this->assertEquals('sub', $paths[1]->name);
-        $this->assertInstanceOf(DirectoryPath::class, $paths[2]);
+        $this->assertInstanceOf(ChildDirectoryPath::class, $paths[2]);
         $this->assertEquals('subsub', $paths[2]->name);
         $this->assertInstanceOf(FilePath::class, $paths[3]);
         $this->assertEquals('index.md', $paths[3]->name);

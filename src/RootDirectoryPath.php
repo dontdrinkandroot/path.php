@@ -2,16 +2,16 @@
 
 namespace Dontdrinkandroot\Path;
 
-class RootPath extends AbstractPath implements ParentPath
+class RootDirectoryPath extends DirectoryPath
 {
     /**
      * {@inheritdoc}
      */
-    public function appendDirectory(string $name): DirectoryPath
+    public function appendDirectory(string $name): ChildDirectoryPath
     {
         PathUtils::assertValidName($name);
 
-        return new DirectoryPath($name, clone $this);
+        return new ChildDirectoryPath($name, clone $this);
     }
 
     /**
@@ -43,8 +43,16 @@ class RootPath extends AbstractPath implements ParentPath
     /**
      * {@inheritdoc}
      */
-    public function getType(): PathType
+    public function collectPaths(): array
     {
-        return PathType::ROOT;
+        return [$this];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend(ChildDirectoryPath $path): ChildDirectoryPath
+    {
+        return clone $path;
     }
 }

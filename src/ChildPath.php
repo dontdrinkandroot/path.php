@@ -2,9 +2,7 @@
 
 namespace Dontdrinkandroot\Path;
 
-interface ChildPath extends Path
+interface ChildPath
 {
-    public function getParent(): ParentPath;
-
-    public function prepend(DirectoryPath $path): Path;
+    public function getParent(): DirectoryPath;
 }

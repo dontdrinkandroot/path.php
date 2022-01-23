@@ -4,8 +4,15 @@ namespace Dontdrinkandroot\Path;
 
 use InvalidArgumentException;
 
-class FilePath extends AbstractChildPath
+class FilePath extends Path implements ChildPath
 {
+    public function __construct(
+        public readonly string $name,
+        public readonly DirectoryPath $parent = new RootDirectoryPath()
+    ) {
+        PathUtils::assertValidName($name);
+    }
+
     public function getFileName(): string
     {
         $lastDotPos = strrpos($this->name, '.');
@@ -45,7 +52,7 @@ class FilePath extends AbstractChildPath
     /**
      * {@inheritdoc}
      */
-    public function prepend(DirectoryPath $path): FilePath
+    public function prepend(ChildDirectoryPath $path): FilePath
     {
         return self::parse($path->toAbsoluteString() . $this->toAbsoluteString());
     }
@@ -77,11 +84,11 @@ class FilePath extends AbstractChildPath
 
         return new FilePath(
             $filePart,
-            null !== $directoryPart ? DirectoryPath::parse($directoryPart, $separator) : new RootPath()
+            null !== $directoryPart ? DirectoryPath::parse($directoryPart, $separator) : new RootDirectoryPath()
         );
     }
 
-    public function withParent(RootPath|DirectoryPath $parent): FilePath
+    public function withParent(RootDirectoryPath|ChildDirectoryPath $parent): FilePath
     {
         return new FilePath($this->name, $parent);
     }
@@ -92,5 +99,21 @@ class FilePath extends AbstractChildPath
     public function getType(): PathType
     {
         return PathType::FILE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent(): DirectoryPath
+    {
+        return $this->parent;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function collectPaths(): array
+    {
+        return [...$this->parent->collectPaths(), $this];
     }
 }

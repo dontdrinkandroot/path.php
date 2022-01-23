@@ -30,11 +30,11 @@ class PathUtilsTest extends TestCase
         $this->assertEquals($to, $from->appendPathString($result));
         $this->assertEquals($to->__toString(), $from->appendPathString($result)->__toString());
 
-        $this->assertEquals('../', PathUtils::getPathDiff(new DirectoryPath('test'), new RootPath()));
-        $this->assertEquals('test/', PathUtils::getPathDiff(new RootPath(), new DirectoryPath('test')));
-        $this->assertEquals('../b/', PathUtils::getPathDiff(new DirectoryPath('a'), new DirectoryPath('b')));
-        $this->assertEquals('', PathUtils::getPathDiff(new FilePath('a.txt'), new RootPath()));
-        $this->assertEquals('a.txt', PathUtils::getPathDiff(new RootPath(), new FilePath('a.txt')));
+        $this->assertEquals('../', PathUtils::getPathDiff(new ChildDirectoryPath('test'), new RootDirectoryPath()));
+        $this->assertEquals('test/', PathUtils::getPathDiff(new RootDirectoryPath(), new ChildDirectoryPath('test')));
+        $this->assertEquals('../b/', PathUtils::getPathDiff(new ChildDirectoryPath('a'), new ChildDirectoryPath('b')));
+        $this->assertEquals('', PathUtils::getPathDiff(new FilePath('a.txt'), new RootDirectoryPath()));
+        $this->assertEquals('a.txt', PathUtils::getPathDiff(new RootDirectoryPath(), new FilePath('a.txt')));
         $this->assertEquals('b.txt', PathUtils::getPathDiff(new FilePath('a.txt'), new FilePath('b.txt')));
         $this->assertEquals('c/b.txt', PathUtils::getPathDiff(new FilePath('a.txt'), FilePath::parse('c/b.txt')));
 
