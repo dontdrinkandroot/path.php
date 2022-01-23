@@ -54,6 +54,10 @@ abstract class Path
         return FilePath::parse($pathString);
     }
 
+    abstract public function getName(): ?string;
+
+    abstract public function getParent(): ?DirectoryPath;
+
     /** @return list<Path> */
     abstract public function collectPaths(): array;
 

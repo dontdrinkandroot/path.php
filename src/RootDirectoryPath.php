@@ -55,4 +55,20 @@ class RootDirectoryPath extends DirectoryPath
     {
         return clone $path;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent(): ?DirectoryPath
+    {
+        return null;
+    }
 }
