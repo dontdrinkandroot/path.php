@@ -13,6 +13,14 @@ class FilePath extends Path implements ChildPath
         PathUtils::assertValidName($name);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
     public function getFileName(): string
     {
         $lastDotPos = strrpos($this->name, '.');

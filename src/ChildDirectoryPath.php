@@ -2,13 +2,21 @@
 
 namespace Dontdrinkandroot\Path;
 
-class ChildDirectoryPath extends DirectoryPath
+class ChildDirectoryPath extends DirectoryPath implements ChildPath
 {
     public function __construct(
         public readonly string $name,
         public readonly DirectoryPath $parent = new RootDirectoryPath()
     ) {
         PathUtils::assertValidName($name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**
