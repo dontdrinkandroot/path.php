@@ -32,4 +32,13 @@ class PathTest extends TestCase
         self::assertEquals('test', $path->parent->name);
         self::assertInstanceOf(RootDirectoryPath::class, $path->parent->parent);
     }
+
+    public function testClone(): void
+    {
+        $path = FilePath::parse('/directory/file.extension');
+        $clonedPath = $path->clone();
+        self::assertNotSame($path, $clonedPath);
+        self::assertNotSame($path->getParent(), $clonedPath->getParent());
+        self::assertNotSame($path->getParent()->getParent(), $clonedPath->getParent()->getParent());
+    }
 }

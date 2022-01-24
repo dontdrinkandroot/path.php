@@ -8,23 +8,19 @@ use InvalidArgumentException;
 abstract class DirectoryPath extends Path
 {
     /**
-     * @param string|null   $pathString
-     * @param DirectoryPath $rootPath
+     * @param string        $pathString
+     * @param DirectoryPath $relativeToPath
      * @param string        $separator
      *
      * @return DirectoryPath
      * @throws Exception
      */
     public static function parseDirectoryPath(
-        ?string $pathString,
-        DirectoryPath $rootPath,
+        string $pathString,
+        DirectoryPath $relativeToPath,
         string $separator = '/'
     ): DirectoryPath {
-        if (null === $pathString) {
-            return $rootPath;
-        }
-
-        $lastPath = $rootPath;
+        $lastPath = $relativeToPath->clone();
         $parts = explode($separator, $pathString);
         foreach ($parts as $part) {
             $trimmedPart = trim($part);
@@ -64,12 +60,12 @@ abstract class DirectoryPath extends Path
 
     public function appendDirectory(string $name): ChildDirectoryPath
     {
-        return new ChildDirectoryPath($name, clone $this);
+        return new ChildDirectoryPath($name, $this->clone());
     }
 
     public function appendFile(string $name): FilePath
     {
-        return new FilePath($name, clone $this);
+        return new FilePath($name, $this->clone());
     }
 
     /**
@@ -89,10 +85,8 @@ abstract class DirectoryPath extends Path
     public function appendPathString(string $pathString): Path
     {
         if ('' === $pathString) {
-            return clone $this;
+            return $this->clone();
         }
-
-        $lastPath = $this;
 
         $filePart = null;
         $lastSlashPos = strrpos($pathString, '/');
@@ -108,7 +102,9 @@ abstract class DirectoryPath extends Path
             }
         }
 
-        $directoryPath = DirectoryPath::parseDirectoryPath($directoryPart, $lastPath);
+        $directoryPath = null === $directoryPart
+            ? $this->clone()
+            : DirectoryPath::parseDirectoryPath($directoryPart, $this);
 
         if (null !== $filePart) {
             return new FilePath($filePart, $directoryPath);
@@ -116,4 +112,9 @@ abstract class DirectoryPath extends Path
 
         return $directoryPath;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    abstract public function clone(): DirectoryPath;
 }

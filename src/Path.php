@@ -67,6 +67,7 @@ abstract class Path
 
     abstract public function getType(): PathType;
 
-    abstract public function prepend(ChildDirectoryPath $path): Path;
+    abstract public function prepend(DirectoryPath $path): Path;
 
+    abstract public function clone(): Path;
 }

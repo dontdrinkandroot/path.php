@@ -58,7 +58,7 @@ class ChildDirectoryPath extends DirectoryPath implements ChildPath
     /**
      * {@inheritdoc}
      */
-    public function prepend(ChildDirectoryPath $path): ChildDirectoryPath
+    public function prepend(DirectoryPath $path): ChildDirectoryPath
     {
         $directoryPath = DirectoryPath::parse($path->toAbsoluteString() . $this->toAbsoluteString());
         assert($directoryPath instanceof ChildDirectoryPath);
@@ -85,5 +85,13 @@ class ChildDirectoryPath extends DirectoryPath implements ChildPath
     public function collectPaths(): array
     {
         return [...$this->parent->collectPaths(), $this];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clone(): ChildDirectoryPath
+    {
+        return new ChildDirectoryPath($this->name, $this->parent->clone());
     }
 }

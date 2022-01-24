@@ -60,7 +60,7 @@ class FilePath extends Path implements ChildPath
     /**
      * {@inheritdoc}
      */
-    public function prepend(ChildDirectoryPath $path): FilePath
+    public function prepend(DirectoryPath $path): FilePath
     {
         return self::parse($path->toAbsoluteString() . $this->toAbsoluteString());
     }
@@ -123,5 +123,13 @@ class FilePath extends Path implements ChildPath
     public function collectPaths(): array
     {
         return [...$this->parent->collectPaths(), $this];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clone(): FilePath
+    {
+        return new FilePath($this->name, $this->parent->clone());
     }
 }

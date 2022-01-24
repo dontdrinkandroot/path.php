@@ -11,7 +11,7 @@ class RootDirectoryPath extends DirectoryPath
     {
         PathUtils::assertValidName($name);
 
-        return new ChildDirectoryPath($name, clone $this);
+        return new ChildDirectoryPath($name, $this->clone());
     }
 
     /**
@@ -21,7 +21,7 @@ class RootDirectoryPath extends DirectoryPath
     {
         PathUtils::assertValidName($name);
 
-        return new FilePath($name, clone $this);
+        return new FilePath($name, $this->clone());
     }
 
     /**
@@ -51,9 +51,9 @@ class RootDirectoryPath extends DirectoryPath
     /**
      * {@inheritdoc}
      */
-    public function prepend(ChildDirectoryPath $path): ChildDirectoryPath
+    public function prepend(DirectoryPath $path): DirectoryPath
     {
-        return clone $path;
+        return $path->clone();
     }
 
     /**
@@ -70,5 +70,13 @@ class RootDirectoryPath extends DirectoryPath
     public function getParent(): ?DirectoryPath
     {
         return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clone(): RootDirectoryPath
+    {
+        return new RootDirectoryPath();
     }
 }
