@@ -41,4 +41,40 @@ class PathTest extends TestCase
         self::assertNotSame($path->getParent(), $clonedPath->getParent());
         self::assertNotSame($path->getParent()->getParent(), $clonedPath->getParent()->getParent());
     }
+
+    public function testDiff(): void
+    {
+        $from = new RootDirectoryPath();
+        $to = new RootDirectoryPath();
+        $result = $from->diff($to);
+        $this->assertEquals('', $result);
+        $this->assertEquals($to, $from->appendPathString($result));
+        $this->assertEquals($to->__toString(), $from->appendPathString($result)->__toString());
+
+        $from = DirectoryPath::parse('a/b/c/');
+        $to = DirectoryPath::parse('a/b/d/');
+        $result = $from->diff($to);
+        $this->assertEquals('../d/', $result);
+        $this->assertEquals($to, $from->appendPathString($result));
+        $this->assertEquals($to->__toString(), $from->appendPathString($result)->__toString());
+
+        $from = DirectoryPath::parse('a/b/c/');
+        $to = DirectoryPath::parse('d/e/f/');
+        $result = $from->diff($to);
+        $this->assertEquals('../../../d/e/f/', $result);
+        $this->assertEquals($to, $from->appendPathString($result));
+        $this->assertEquals($to->__toString(), $from->appendPathString($result)->__toString());
+
+        $this->assertEquals('../', (new ChildDirectoryPath('test'))->diff(new RootDirectoryPath()));
+        $this->assertEquals('test/', (new RootDirectoryPath())->diff(new ChildDirectoryPath('test')));
+        $this->assertEquals('../b/', (new ChildDirectoryPath('a'))->diff(new ChildDirectoryPath('b')));
+        $this->assertEquals('', (new FilePath('a.txt'))->diff(new RootDirectoryPath()));
+        $this->assertEquals('a.txt', (new RootDirectoryPath())->diff(new FilePath('a.txt')));
+        $this->assertEquals('b.txt', (new FilePath('a.txt'))->diff(new FilePath('b.txt')));
+        $this->assertEquals('c/b.txt', (new FilePath('a.txt'))->diff(FilePath::parse('c/b.txt')));
+
+        $from = FilePath::parse('c/a.txt');
+        $to = new FilePath('b.txt');
+        $this->assertEquals('..\b.txt', $from->diff($to, '\\'));
+    }
 }

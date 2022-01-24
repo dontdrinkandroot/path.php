@@ -8,7 +8,7 @@ class ChildDirectoryPath extends DirectoryPath implements ChildPath
         public readonly string $name,
         public readonly DirectoryPath $parent = new RootDirectoryPath()
     ) {
-        PathUtils::assertValidName($name);
+        self::assertValidName($name);
     }
 
     /**
@@ -24,7 +24,7 @@ class ChildDirectoryPath extends DirectoryPath implements ChildPath
      */
     public function appendDirectory(string $name): ChildDirectoryPath
     {
-        PathUtils::assertValidName($name);
+        self::assertValidName($name);
 
         return new ChildDirectoryPath($name, $this);
     }
@@ -34,7 +34,7 @@ class ChildDirectoryPath extends DirectoryPath implements ChildPath
      */
     public function appendFile(string $name): FilePath
     {
-        PathUtils::assertValidName($name);
+        self::assertValidName($name);
 
         return new FilePath($name, $this);
     }

@@ -9,7 +9,7 @@ class RootDirectoryPath extends DirectoryPath
      */
     public function appendDirectory(string $name): ChildDirectoryPath
     {
-        PathUtils::assertValidName($name);
+        self::assertValidName($name);
 
         return new ChildDirectoryPath($name, $this->clone());
     }
@@ -19,7 +19,7 @@ class RootDirectoryPath extends DirectoryPath
      */
     public function appendFile(string $name): FilePath
     {
-        PathUtils::assertValidName($name);
+        self::assertValidName($name);
 
         return new FilePath($name, $this->clone());
     }

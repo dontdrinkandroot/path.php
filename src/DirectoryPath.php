@@ -51,7 +51,7 @@ abstract class DirectoryPath extends Path
             throw new InvalidArgumentException('Path String must not be empty');
         }
 
-        if (!(PathUtils::getLastChar($pathString) === $separator)) {
+        if (!(str_ends_with($pathString, $separator))) {
             throw new InvalidArgumentException('Path String must end with ' . $separator);
         }
 
@@ -94,7 +94,7 @@ abstract class DirectoryPath extends Path
         if ($lastSlashPos === false) {
             $directoryPart = null;
         }
-        if (!PathUtils::endsWith($pathString, '/')) {
+        if (!str_ends_with($pathString, '/')) {
             $filePart = $pathString;
             if (false !== $lastSlashPos) {
                 $directoryPart = substr($pathString, 0, $lastSlashPos + 1);

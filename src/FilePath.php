@@ -10,7 +10,7 @@ class FilePath extends Path implements ChildPath
         public readonly string $name,
         public readonly DirectoryPath $parent = new RootDirectoryPath()
     ) {
-        PathUtils::assertValidName($name);
+        self::assertValidName($name);
     }
 
     /**
@@ -78,7 +78,7 @@ class FilePath extends Path implements ChildPath
             throw new InvalidArgumentException('Path String must not be empty');
         }
 
-        if (PathUtils::getLastChar($pathString) === $separator) {
+        if (str_ends_with($pathString, $separator)) {
             throw new InvalidArgumentException('Path String must not end with ' . $separator);
         }
 
