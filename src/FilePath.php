@@ -66,10 +66,8 @@ class FilePath extends Path implements ChildPath
     }
 
     /**
-     * @param string $pathString
-     * @param string $separator
+     * @param non-empty-string $separator
      *
-     * @return FilePath
      * @throws InvalidArgumentException
      */
     public static function parse(string $pathString, string $separator = '/'): FilePath

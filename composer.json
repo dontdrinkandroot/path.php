@@ -17,7 +17,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Dontdrinkandroot\\Path\\": "test/"
+            "Dontdrinkandroot\\Path\\": "tests/"
         }
     },
     "require": {

@@ -8,9 +8,9 @@ use InvalidArgumentException;
 abstract class DirectoryPath extends Path
 {
     /**
-     * @param string        $pathString
+     * @param string $pathString
      * @param DirectoryPath $relativeToPath
-     * @param string        $separator
+     * @param non-empty-string $separator
      *
      * @return DirectoryPath
      * @throws Exception
@@ -40,7 +40,7 @@ abstract class DirectoryPath extends Path
 
     /**
      * @param string $pathString
-     * @param string $separator
+     * @param non-empty-string $separator
      *
      * @return DirectoryPath
      * @throws InvalidArgumentException

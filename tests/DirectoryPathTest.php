@@ -86,11 +86,11 @@ class DirectoryPathTest extends TestCase
         $this->assertFirstLevel($path);
     }
 
-    protected function assertFirstLevel(ChildDirectoryPath $path): void
+    protected function assertFirstLevel(Path $path): void
     {
-        $this->assertEquals('sub', $path->name);
+        $this->assertEquals('sub', $path->getName());
         $this->assertEquals('/sub/', $path->toAbsoluteUrlString());
-        $this->assertInstanceOf(RootDirectoryPath::class, $path->parent);
+        $this->assertInstanceOf(RootDirectoryPath::class, $path->getParent());
     }
 
     public function testSecondLevel(): void
@@ -105,12 +105,12 @@ class DirectoryPathTest extends TestCase
         $this->assertSecondLevel($path);
     }
 
-    protected function assertSecondLevel(ChildDirectoryPath $path)
+    protected function assertSecondLevel(Path $path): void
     {
-        $this->assertEquals('subsub', $path->name);
+        $this->assertEquals('subsub', $path->getName());
         $this->assertEquals('/sub/subsub/', $path->toAbsoluteUrlString());
-        $this->assertInstanceOf(ChildDirectoryPath::class, $path->parent);
-        $this->assertInstanceOf(RootDirectoryPath::class, $path->parent->parent);
+        $this->assertInstanceOf(ChildDirectoryPath::class, $path->getParent());
+        $this->assertInstanceOf(RootDirectoryPath::class, $path->getParent()?->getParent());
     }
 
     public function testAppend(): void
@@ -127,14 +127,14 @@ class DirectoryPathTest extends TestCase
         $this->assertEquals('md', $filePath->getExtension());
     }
 
-    public function testCollectPaths()
+    public function testCollectPaths(): void
     {
         $path = DirectoryPath::parse("/sub/subsub/");
         $paths = $path->collectPaths();
         $this->assertCount(3, $paths);
         $this->assertInstanceOf(RootDirectoryPath::class, $paths[0]);
-        $this->assertEquals('sub', $paths[1]->name);
-        $this->assertEquals('subsub', $paths[2]->name);
+        $this->assertEquals('sub', $paths[1]->getName());
+        $this->assertEquals('subsub', $paths[2]->getName());
     }
 
     public function testToStrings(): void
@@ -163,13 +163,13 @@ class DirectoryPathTest extends TestCase
         $this->assertEquals('/sub/subsub/', (string)$path);
     }
 
-    public function testComplicatedPath()
+    public function testComplicatedPath(): void
     {
         $path = DirectoryPath::parse('/sub/./bla//../subsub/');
         $this->assertSecondLevel($path);
     }
 
-    public function testPrepend()
+    public function testPrepend(): void
     {
         $path1 = DirectoryPath::parse("/sub/");
         $path2 = DirectoryPath::parse("/subsub/");
@@ -183,6 +183,7 @@ class DirectoryPathTest extends TestCase
 
         $directoryPath = $path->appendPathString('subsub/');
         $this->assertSecondLevel($directoryPath);
+        $this->assertInstanceOf(ChildDirectoryPath::class, $directoryPath);
 
         $filePath = $path->appendPathString('subsub/index.md');
         $this->assertInstanceOf(FilePath::class, $filePath);

@@ -70,7 +70,8 @@ class FilePathTest extends TestCase
     public function testInvalidPath(): void
     {
         try {
-            $path = new FilePath(null);
+            /** @psalm-suppress NullArgument */
+            new FilePath(null);
             $this->fail('Exception expected');
         } catch (Throwable $e) {
             /* Expected */
@@ -78,7 +79,7 @@ class FilePathTest extends TestCase
         }
 
         try {
-            $path = new FilePath('bla/bla');
+            new FilePath('bla/bla');
             $this->fail('Exception expected');
         } catch (Exception $e) {
             /* Expected */
@@ -86,7 +87,7 @@ class FilePathTest extends TestCase
         }
 
         try {
-            $path = FilePath::parse('');
+            FilePath::parse('');
             $this->fail('Exception expected');
         } catch (Exception $e) {
             /* Expected */
@@ -94,7 +95,7 @@ class FilePathTest extends TestCase
         }
 
         try {
-            $path = FilePath::parse('/');
+            FilePath::parse('/');
             $this->fail('Exception expected');
         } catch (Exception $e) {
             /* Expected */
@@ -131,13 +132,13 @@ class FilePathTest extends TestCase
         );
     }
 
-    public function testParse()
+    public function testParse(): void
     {
         $this->assertEquals('/sub/subsub/index.md', FilePath::parse("/sub/subsub/index.md")->toAbsoluteString());
         $this->assertEquals('/sub/subsub/index.md', FilePath::parse('\sub\subsub\index.md', '\\')->toAbsoluteString());
     }
 
-    public function testPrepend()
+    public function testPrepend(): void
     {
         $path1 = DirectoryPath::parse("/sub/");
         $path2 = FilePath::parse("/subsub/index.md");
