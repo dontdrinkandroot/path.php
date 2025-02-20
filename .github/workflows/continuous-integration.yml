@@ -13,7 +13,7 @@ jobs:
 
     sonarcloud:
         uses: dontdrinkandroot/github-actions/.github/workflows/php-sonarcloud.yml@main
-        needs: phpstan
+        needs: phpunit
         with:
             project-key: 'dontdrinkandroot_path.php'
         secrets: inherit
