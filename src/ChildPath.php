@@ -33,4 +33,10 @@ abstract class ChildPath extends Path implements ChildPathInterface
     {
         return [...$this->parent->collectPaths(), $this];
     }
+
+    #[Override]
+    public function isChildPath(): bool
+    {
+        return true;
+    }
 }

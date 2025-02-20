@@ -29,6 +29,8 @@ interface PathInterface extends Stringable
 
     public function isDirectoryPath(): bool;
 
+    public function isChildPath(): bool;
+
     public function getType(): PathType;
 
     public function clone(): PathInterface;

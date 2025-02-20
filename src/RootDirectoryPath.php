@@ -37,4 +37,10 @@ class RootDirectoryPath extends Path implements DirectoryPathInterface
     {
         return new RootDirectoryPath();
     }
+
+    #[Override]
+    public function isChildPath(): bool
+    {
+        return false;
+    }
 }
