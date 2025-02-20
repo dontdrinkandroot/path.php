@@ -31,7 +31,7 @@ class ChildDirectoryPath extends ChildPath implements DirectoryPathInterface
 
     public function withParent(RootDirectoryPath|ChildDirectoryPath $parent): ChildDirectoryPath
     {
-        return new ChildDirectoryPath($this->name, $parent);
+        return new ChildDirectoryPath($this->name, $parent->clone());
     }
 
     #[Override]

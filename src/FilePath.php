@@ -83,7 +83,7 @@ class FilePath extends ChildPath implements FilePathInterface
 
     public function withParent(RootDirectoryPath|ChildDirectoryPath $parent): FilePath
     {
-        return new FilePath($this->name, $parent);
+        return new FilePath($this->name, $parent->clone());
     }
 
     #[Override]
