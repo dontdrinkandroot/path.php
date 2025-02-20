@@ -4,23 +4,9 @@ namespace Dontdrinkandroot\Path;
 
 use Override;
 
-class RootDirectoryPath extends DirectoryPath
+class RootDirectoryPath extends Path implements DirectoryPathInterface
 {
-    #[Override]
-    public function appendDirectory(string $name): ChildDirectoryPath
-    {
-        self::assertValidName($name);
-
-        return new ChildDirectoryPath($name, $this->clone());
-    }
-
-    #[Override]
-    public function appendFile(string $name): FilePath
-    {
-        self::assertValidName($name);
-
-        return new FilePath($name, $this->clone());
-    }
+    use DirectoryPathTrait;
 
     #[Override]
     public function toAbsoluteString(string $separator = '/'): string
@@ -41,21 +27,9 @@ class RootDirectoryPath extends DirectoryPath
     }
 
     #[Override]
-    public function prepend(DirectoryPath $path): DirectoryPath
+    public function prepend(DirectoryPathInterface $path): PathInterface
     {
         return $path->clone();
-    }
-
-    #[Override]
-    public function getName(): ?string
-    {
-        return null;
-    }
-
-    #[Override]
-    public function getParent(): ?DirectoryPath
-    {
-        return null;
     }
 
     #[Override]

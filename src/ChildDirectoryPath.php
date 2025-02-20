@@ -4,36 +4,9 @@ namespace Dontdrinkandroot\Path;
 
 use Override;
 
-class ChildDirectoryPath extends DirectoryPath implements ChildPath
+class ChildDirectoryPath extends ChildPath implements DirectoryPathInterface
 {
-    public function __construct(
-        public readonly string $name,
-        public readonly DirectoryPath $parent = new RootDirectoryPath()
-    ) {
-        self::assertValidName($name);
-    }
-
-    #[Override]
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    #[Override]
-    public function appendDirectory(string $name): ChildDirectoryPath
-    {
-        self::assertValidName($name);
-
-        return new ChildDirectoryPath($name, $this);
-    }
-
-    #[Override]
-    public function appendFile(string $name): FilePath
-    {
-        self::assertValidName($name);
-
-        return new FilePath($name, $this);
-    }
+    use DirectoryPathTrait;
 
     #[Override]
     public function toRelativeString(string $separator = '/'): string
@@ -48,10 +21,10 @@ class ChildDirectoryPath extends DirectoryPath implements ChildPath
     }
 
     #[Override]
-    public function prepend(DirectoryPath $path): ChildDirectoryPath
+    public function prepend(DirectoryPathInterface $path): ChildPathInterface&DirectoryPathInterface
     {
         $directoryPath = DirectoryPath::parse($path->toAbsoluteString() . $this->toAbsoluteString());
-        assert($directoryPath instanceof ChildDirectoryPath);
+        assert($directoryPath instanceof ChildPathInterface);
 
         return $directoryPath;
     }
@@ -62,19 +35,7 @@ class ChildDirectoryPath extends DirectoryPath implements ChildPath
     }
 
     #[Override]
-    public function getParent(): DirectoryPath
-    {
-        return $this->parent;
-    }
-
-    #[Override]
-    public function collectPaths(): array
-    {
-        return [...$this->parent->collectPaths(), $this];
-    }
-
-    #[Override]
-    public function clone(): ChildDirectoryPath
+    public function clone(): DirectoryPathInterface&ChildPathInterface
     {
         return new ChildDirectoryPath($this->name, $this->parent->clone());
     }

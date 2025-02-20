@@ -38,8 +38,12 @@ class PathTest extends TestCase
         $path = FilePath::parse('/directory/file.extension');
         $clonedPath = $path->clone();
         self::assertNotSame($path, $clonedPath);
-        self::assertNotSame($path->getParent(), $clonedPath->getParent());
-        self::assertNotSame($path->getParent()->getParent(), $clonedPath->getParent()->getParent());
+        $parent = $path->getParent();
+        $clonedParent = $clonedPath->getParent();
+        self::assertNotSame($parent, $clonedParent);
+        self::assertInstanceOf(ChildPathInterface::class, $parent);
+        self::assertInstanceOf(ChildPathInterface::class, $clonedParent);
+        self::assertNotSame($parent->getParent(), $clonedParent->getParent());
     }
 
     public function testDiff(): void

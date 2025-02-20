@@ -5,21 +5,9 @@ namespace Dontdrinkandroot\Path;
 use InvalidArgumentException;
 use Override;
 
-class FilePath extends Path implements ChildPath
+class FilePath extends ChildPath implements FilePathInterface
 {
-    public function __construct(
-        public readonly string $name,
-        public readonly DirectoryPath $parent = new RootDirectoryPath()
-    ) {
-        self::assertValidName($name);
-    }
-
     #[Override]
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
     public function getFileName(): string
     {
         $lastDotPos = strrpos($this->name, '.');
@@ -30,6 +18,7 @@ class FilePath extends Path implements ChildPath
         return $this->name;
     }
 
+    #[Override]
     public function getExtension(): ?string
     {
         $lastDotPos = strrpos($this->name, '.');
@@ -53,7 +42,7 @@ class FilePath extends Path implements ChildPath
     }
 
     #[Override]
-    public function prepend(DirectoryPath $path): FilePath
+    public function prepend(DirectoryPathInterface $path): FilePath
     {
         return self::parse($path->toAbsoluteString() . $this->toAbsoluteString());
     }
@@ -82,6 +71,10 @@ class FilePath extends Path implements ChildPath
             $filePart = substr($pathString, $lastSlashPos + 1);
         }
 
+        if ('' === $filePart) {
+            throw new InvalidArgumentException('File part was empty');
+        }
+
         return new FilePath(
             $filePart,
             null !== $directoryPart ? DirectoryPath::parse($directoryPart, $separator) : new RootDirectoryPath()
@@ -100,20 +93,26 @@ class FilePath extends Path implements ChildPath
     }
 
     #[Override]
-    public function getParent(): DirectoryPath
-    {
-        return $this->parent;
-    }
-
-    #[Override]
     public function collectPaths(): array
     {
         return [...$this->parent->collectPaths(), $this];
     }
 
     #[Override]
-    public function clone(): FilePath
+    public function clone(): FilePathInterface
     {
         return new FilePath($this->name, $this->parent->clone());
+    }
+
+    #[Override]
+    public function isDirectoryPath(): bool
+    {
+        return false;
+    }
+
+    #[Override]
+    public function resolveNearestDirectoryPath(): DirectoryPathInterface
+    {
+        return $this->parent;
     }
 }
