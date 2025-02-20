@@ -5,8 +5,6 @@ namespace Dontdrinkandroot\Path;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use Throwable;
-use TypeError;
 
 class FilePathTest extends TestCase
 {
@@ -69,15 +67,6 @@ class FilePathTest extends TestCase
 
     public function testInvalidPath(): void
     {
-        try {
-            /** @psalm-suppress NullArgument */
-            new FilePath(null);
-            $this->fail('Exception expected');
-        } catch (Throwable $e) {
-            /* Expected */
-            $this->assertInstanceOf(TypeError::class, $e);
-        }
-
         try {
             new FilePath('bla/bla');
             $this->fail('Exception expected');

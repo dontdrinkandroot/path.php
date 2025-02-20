@@ -3,6 +3,7 @@
 namespace Dontdrinkandroot\Path;
 
 use InvalidArgumentException;
+use Override;
 
 class FilePath extends Path implements ChildPath
 {
@@ -13,9 +14,7 @@ class FilePath extends Path implements ChildPath
         self::assertValidName($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function getName(): string
     {
         return $this->name;
@@ -41,25 +40,19 @@ class FilePath extends Path implements ChildPath
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function toRelativeString(string $separator = '/'): string
     {
         return $this->parent->toRelativeString($separator) . $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function toAbsoluteString(string $separator = '/'): string
     {
         return $this->parent->toAbsoluteString($separator) . $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function prepend(DirectoryPath $path): FilePath
     {
         return self::parse($path->toAbsoluteString() . $this->toAbsoluteString());
@@ -70,6 +63,7 @@ class FilePath extends Path implements ChildPath
      *
      * @throws InvalidArgumentException
      */
+    #[Override]
     public static function parse(string $pathString, string $separator = '/'): FilePath
     {
         if ('' === $pathString) {
@@ -99,33 +93,25 @@ class FilePath extends Path implements ChildPath
         return new FilePath($this->name, $parent);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function getType(): PathType
     {
         return PathType::FILE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function getParent(): DirectoryPath
     {
         return $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function collectPaths(): array
     {
         return [...$this->parent->collectPaths(), $this];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function clone(): FilePath
     {
         return new FilePath($this->name, $this->parent->clone());

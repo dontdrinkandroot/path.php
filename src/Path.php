@@ -3,9 +3,11 @@
 namespace Dontdrinkandroot\Path;
 
 use InvalidArgumentException;
+use Override;
 use RuntimeException;
+use Stringable;
 
-abstract class Path
+abstract class Path implements Stringable
 {
     /**
      * {@inheritdoc}
@@ -31,14 +33,12 @@ abstract class Path
         return $this->toAbsoluteString(DIRECTORY_SEPARATOR);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toRelativeFileSystemString(): string
     {
         return $this->toRelativeString(DIRECTORY_SEPARATOR);
     }
 
+    #[Override]
     public function __toString(): string
     {
         return $this->toAbsoluteString();
@@ -62,7 +62,7 @@ abstract class Path
         $fromDirectoryPath = $this->resolveNearestDirectoryPath();
         $toDirectoryPath = $other->resolveNearestDirectoryPath();
 
-        $pathDiff = static::getDirectoryPathDiff($fromDirectoryPath, $toDirectoryPath, $separator);
+        $pathDiff = self::getDirectoryPathDiff($fromDirectoryPath, $toDirectoryPath, $separator);
         if ($other instanceof FilePath) {
             $pathDiff .= $other->name;
         }
@@ -76,7 +76,7 @@ abstract class Path
         string $separator = '/'
     ): string {
         $fromParts = self::getDirectoryPathParts($fromPath);
-        $toParts = static::getDirectoryPathParts($toPath);
+        $toParts = self::getDirectoryPathParts($toPath);
 
         $fromDepth = count($fromParts);
         $toDepth = count($toParts);

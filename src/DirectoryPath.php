@@ -4,6 +4,7 @@ namespace Dontdrinkandroot\Path;
 
 use Exception;
 use InvalidArgumentException;
+use Override;
 
 abstract class DirectoryPath extends Path
 {
@@ -45,6 +46,7 @@ abstract class DirectoryPath extends Path
      * @return DirectoryPath
      * @throws InvalidArgumentException
      */
+    #[Override]
     public static function parse(string $pathString, string $separator = '/'): DirectoryPath
     {
         if ('' === $pathString) {
@@ -68,18 +70,13 @@ abstract class DirectoryPath extends Path
         return new FilePath($name, $this->clone());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function getType(): PathType
     {
         return PathType::DIRECTORY;
     }
 
     /**
-     * @param string $pathString
-     *
-     * @return Path
      * @throws Exception
      */
     public function appendPathString(string $pathString): Path
@@ -113,8 +110,6 @@ abstract class DirectoryPath extends Path
         return $directoryPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     abstract public function clone(): DirectoryPath;
 }

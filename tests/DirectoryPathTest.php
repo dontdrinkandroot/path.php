@@ -110,7 +110,7 @@ class DirectoryPathTest extends TestCase
         $this->assertEquals('subsub', $path->getName());
         $this->assertEquals('/sub/subsub/', $path->toAbsoluteUrlString());
         $this->assertInstanceOf(ChildDirectoryPath::class, $path->getParent());
-        $this->assertInstanceOf(RootDirectoryPath::class, $path->getParent()?->getParent());
+        $this->assertInstanceOf(RootDirectoryPath::class, $path->getParent()->getParent());
     }
 
     public function testAppend(): void

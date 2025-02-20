@@ -2,6 +2,8 @@
 
 namespace Dontdrinkandroot\Path;
 
+use Override;
+
 class ChildDirectoryPath extends DirectoryPath implements ChildPath
 {
     public function __construct(
@@ -11,17 +13,13 @@ class ChildDirectoryPath extends DirectoryPath implements ChildPath
         self::assertValidName($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function appendDirectory(string $name): ChildDirectoryPath
     {
         self::assertValidName($name);
@@ -29,9 +27,7 @@ class ChildDirectoryPath extends DirectoryPath implements ChildPath
         return new ChildDirectoryPath($name, $this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function appendFile(string $name): FilePath
     {
         self::assertValidName($name);
@@ -39,25 +35,19 @@ class ChildDirectoryPath extends DirectoryPath implements ChildPath
         return new FilePath($name, $this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function toRelativeString(string $separator = '/'): string
     {
         return $this->parent->toRelativeString() . $this->name . $separator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function toAbsoluteString(string $separator = '/'): string
     {
         return $this->parent->toAbsoluteString() . $this->name . $separator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function prepend(DirectoryPath $path): ChildDirectoryPath
     {
         $directoryPath = DirectoryPath::parse($path->toAbsoluteString() . $this->toAbsoluteString());
@@ -71,25 +61,19 @@ class ChildDirectoryPath extends DirectoryPath implements ChildPath
         return new ChildDirectoryPath($this->name, $parent);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function getParent(): DirectoryPath
     {
         return $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function collectPaths(): array
     {
         return [...$this->parent->collectPaths(), $this];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[Override]
     public function clone(): ChildDirectoryPath
     {
         return new ChildDirectoryPath($this->name, $this->parent->clone());
