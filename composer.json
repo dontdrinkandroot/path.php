@@ -25,11 +25,18 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9.6.10",
-        "phpstan/phpstan": "^2.1"
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpstan/extension-installer": "^1.4"
     },
     "extra": {
         "branch-alias": {
             "dev-main": "0.2.x-dev"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
         }
     }
 }
