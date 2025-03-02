@@ -11,84 +11,84 @@ class FilePathTest extends TestCase
     public function testBasic(): void
     {
         $path = FilePath::parse('/index.md');
-        $this->assertEquals('index.md', $path->name);
-        $this->assertEquals('md', $path->getExtension());
-        $this->assertEquals('index', $path->getFileName());
+        self::assertEquals('index.md', $path->name);
+        self::assertEquals('md', $path->getExtension());
+        self::assertEquals('index', $path->getFileName());
 
         $path = FilePath::parse('index.md');
-        $this->assertEquals('index.md', $path->name);
-        $this->assertEquals('md', $path->getExtension());
-        $this->assertEquals('index', $path->getFileName());
+        self::assertEquals('index.md', $path->name);
+        self::assertEquals('md', $path->getExtension());
+        self::assertEquals('index', $path->getFileName());
 
         $path = FilePath::parse('/sub/subsub/index.md');
-        $this->assertEquals('index.md', $path->name);
-        $this->assertEquals('md', $path->getExtension());
-        $this->assertEquals('index', $path->getFileName());
+        self::assertEquals('index.md', $path->name);
+        self::assertEquals('md', $path->getExtension());
+        self::assertEquals('index', $path->getFileName());
 
-        $this->assertEquals('/sub/subsub/', $path->parent->toAbsoluteUrlString());
+        self::assertEquals('/sub/subsub/', $path->parent->toAbsoluteUrlString());
 
         $path = FilePath::parse('sub/subsub/index.md');
-        $this->assertEquals('index.md', $path->name);
-        $this->assertEquals('md', $path->getExtension());
-        $this->assertEquals('index', $path->getFileName());
+        self::assertEquals('index.md', $path->name);
+        self::assertEquals('md', $path->getExtension());
+        self::assertEquals('index', $path->getFileName());
 
-        $this->assertEquals('/sub/subsub/', $path->parent->toAbsoluteUrlString());
+        self::assertEquals('/sub/subsub/', $path->parent->toAbsoluteUrlString());
     }
 
     public function testNoExtension(): void
     {
         $path = FilePath::parse('/index');
-        $this->assertEquals('index', $path->name);
-        $this->assertNull($path->getExtension());
-        $this->assertEquals('index', $path->getFileName());
+        self::assertEquals('index', $path->name);
+        self::assertNull($path->getExtension());
+        self::assertEquals('index', $path->getFileName());
 
         $path = FilePath::parse('/sub/index');
-        $this->assertEquals('index', $path->name);
-        $this->assertNull($path->getExtension());
-        $this->assertEquals('index', $path->getFileName());
+        self::assertEquals('index', $path->name);
+        self::assertNull($path->getExtension());
+        self::assertEquals('index', $path->getFileName());
 
-        $this->assertEquals('/sub/', $path->parent->toAbsoluteUrlString());
+        self::assertEquals('/sub/', $path->parent->toAbsoluteUrlString());
     }
 
     public function testDotFile(): void
     {
         $path = FilePath::parse('/.index');
-        $this->assertEquals('.index', $path->name);
-        $this->assertNull($path->getExtension());
-        $this->assertEquals('.index', $path->getFileName());
+        self::assertEquals('.index', $path->name);
+        self::assertNull($path->getExtension());
+        self::assertEquals('.index', $path->getFileName());
 
         $path = FilePath::parse('/sub/.index');
-        $this->assertEquals('.index', $path->name);
-        $this->assertNull($path->getExtension());
-        $this->assertEquals('.index', $path->getFileName());
+        self::assertEquals('.index', $path->name);
+        self::assertNull($path->getExtension());
+        self::assertEquals('.index', $path->getFileName());
 
-        $this->assertEquals('/sub/', $path->parent->toAbsoluteUrlString());
+        self::assertEquals('/sub/', $path->parent->toAbsoluteUrlString());
     }
 
     public function testInvalidPath(): void
     {
         try {
             new FilePath('bla/bla');
-            $this->fail('Exception expected');
+            self::fail('Exception expected');
         } catch (Exception $e) {
             /* Expected */
-            $this->assertEquals('Name must not contain /', $e->getMessage());
+            self::assertEquals('Name must not contain /', $e->getMessage());
         }
 
         try {
             FilePath::parse('');
-            $this->fail('Exception expected');
+            self::fail('Exception expected');
         } catch (Exception $e) {
             /* Expected */
-            $this->assertEquals('Path String must not be empty', $e->getMessage());
+            self::assertEquals('Path String must not be empty', $e->getMessage());
         }
 
         try {
             FilePath::parse('/');
-            $this->fail('Exception expected');
+            self::fail('Exception expected');
         } catch (Exception $e) {
             /* Expected */
-            $this->assertEquals('Path String must not end with /', $e->getMessage());
+            self::assertEquals('Path String must not end with /', $e->getMessage());
         }
     }
 
@@ -96,26 +96,26 @@ class FilePathTest extends TestCase
     {
         $path = FilePath::parse("/sub/subsub/index.md");
         $paths = $path->collectPaths();
-        $this->assertCount(4, $paths);
-        $this->assertInstanceOf(RootDirectoryPath::class, $paths[0]);
-        $this->assertInstanceOf(ChildDirectoryPath::class, $paths[1]);
-        $this->assertEquals('sub', $paths[1]->name);
-        $this->assertInstanceOf(ChildDirectoryPath::class, $paths[2]);
-        $this->assertEquals('subsub', $paths[2]->name);
-        $this->assertInstanceOf(FilePath::class, $paths[3]);
-        $this->assertEquals('index.md', $paths[3]->name);
+        self::assertCount(4, $paths);
+        self::assertInstanceOf(RootDirectoryPath::class, $paths[0]);
+        self::assertInstanceOf(ChildDirectoryPath::class, $paths[1]);
+        self::assertEquals('sub', $paths[1]->name);
+        self::assertInstanceOf(ChildDirectoryPath::class, $paths[2]);
+        self::assertEquals('subsub', $paths[2]->name);
+        self::assertInstanceOf(FilePath::class, $paths[3]);
+        self::assertEquals('index.md', $paths[3]->name);
     }
 
     public function testToStrings(): void
     {
         $path = FilePath::parse("/sub/subsub/index.md");
-        $this->assertEquals('/sub/subsub/index.md', $path->toAbsoluteString());
-        $this->assertEquals(
+        self::assertEquals('/sub/subsub/index.md', $path->toAbsoluteString());
+        self::assertEquals(
             DIRECTORY_SEPARATOR . 'sub' . DIRECTORY_SEPARATOR . 'subsub' . DIRECTORY_SEPARATOR . 'index.md',
             $path->toAbsoluteString(DIRECTORY_SEPARATOR)
         );
-        $this->assertEquals('sub/subsub/index.md', $path->toRelativeString());
-        $this->assertEquals(
+        self::assertEquals('sub/subsub/index.md', $path->toRelativeString());
+        self::assertEquals(
             'sub' . DIRECTORY_SEPARATOR . 'subsub' . DIRECTORY_SEPARATOR . 'index.md',
             $path->toRelativeString(DIRECTORY_SEPARATOR)
         );
@@ -123,8 +123,8 @@ class FilePathTest extends TestCase
 
     public function testParse(): void
     {
-        $this->assertEquals('/sub/subsub/index.md', FilePath::parse("/sub/subsub/index.md")->toAbsoluteString());
-        $this->assertEquals('/sub/subsub/index.md', FilePath::parse('\sub\subsub\index.md', '\\')->toAbsoluteString());
+        self::assertEquals('/sub/subsub/index.md', FilePath::parse("/sub/subsub/index.md")->toAbsoluteString());
+        self::assertEquals('/sub/subsub/index.md', FilePath::parse('\sub\subsub\index.md', '\\')->toAbsoluteString());
     }
 
     public function testPrepend(): void
@@ -132,6 +132,6 @@ class FilePathTest extends TestCase
         $path1 = DirectoryPath::parse("/sub/");
         $path2 = FilePath::parse("/subsub/index.md");
         $mergedPath = $path2->prepend($path1);
-        $this->assertEquals('/sub/subsub/index.md', $mergedPath->toAbsoluteUrlString());
+        self::assertEquals('/sub/subsub/index.md', $mergedPath->toAbsoluteUrlString());
     }
 }
